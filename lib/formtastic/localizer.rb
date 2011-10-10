@@ -75,18 +75,14 @@ module Formtastic
 
     protected
 
-    def builder?
-      builder.present?
-    end
-
     def normalize_model_name(name)
-      if !name =~ /\[/ && builder? && builder.respond_to?(:parent_builder) && builder.parent_builder.object_name
+      if !name =~ /\[/ && builder.respond_to?(:parent_builder) && builder.parent_builder.object_name
         # Rails 3.1 nested builder case
         [builder.parent_builder.object_name.to_s, name]
       elsif name =~ /(.+)\[(.+)\]/
         # Rails 3 (and 3.1?) nested builder case with :post rather than @post
         [$1, $2]
-      elsif builder? && builder.respond_to?(:options) && builder.options.key?(:parent_builder)
+      elsif builder.respond_to?(:options) && builder.options.key?(:parent_builder)
         # Rails 3.0 nested builder work-around case, where :parent_builder is provided by f.semantic_form_for
         [builder.options[:parent_builder].object_name.to_s, name]
       else
@@ -96,7 +92,7 @@ module Formtastic
     end
 
     def escape_html_entities(string) #:nodoc:
-      if (builder? && builder.escape_html_entities_in_hints_and_labels) ||
+      if (builder.escape_html_entities_in_hints_and_labels) ||
          (self.respond_to?(:escape_html_entities_in_hints_and_labels) && escape_html_entities_in_hints_and_labels)
         string = builder.template.escape_once(string) unless string.respond_to?(:html_safe?) && string.html_safe? == true # Accept html_safe flag as indicator to skip escaping
       end
@@ -104,7 +100,7 @@ module Formtastic
     end
 
     def i18n_lookups_by_default
-      builder? ? builder.i18n_lookups_by_default : Formtastic::FormBuilder.i18n_lookups_by_default
+      builder.i18n_lookups_by_default
     end
 
   end
